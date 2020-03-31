@@ -15,6 +15,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import scipy as sp
 import scipy.fftpack
+import numpy as np
 from scipy.signal import butter, filtfilt
 
 ''''''
@@ -80,6 +81,19 @@ abs_result_adjusted = abs(result_adjusted)
 # Set lowpass filter, cut-off as 15Hz, sampling frequency as 1000, order as 4
 low_abs_result_adjusted = butter_lowpass_filter(abs_result_adjusted, 15, 1000, 4)
 
+# print(type(low_abs_result_adjusted)) → <class 'numpy.ndarray'>
+
+# Normalization
+Zmax, Zmin = low_abs_result_adjusted.max(), low_abs_result_adjusted.min()
+norm_low_abs_result_adjusted = (low_abs_result_adjusted - Zmin) / (Zmax - Zmin)
+
+'''
 plt.figure()
-plt.plot(low_abs_result_adjusted)
+plt.plot(low_abs_result_adjusted, label='low_abs_adj')
+plt.plot(norm_low_abs_result_adjusted, label='norm_low_abs_adj')
+plt.legend(loc='upper left')
 plt.show()
+'''
+
+# print(norm_low_abs_result_adjusted.size) → 1984
+
