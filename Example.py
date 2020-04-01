@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import scipy as sp
 import scipy.fftpack
 import numpy as np
+import seaborn as sns
 from scipy.signal import butter, filtfilt
 
 ''''''
@@ -54,13 +55,12 @@ Not using this code;
 df_fft = sp.fftpack.fft(df)
 rev_df_fft = np.abs(df_fft)
 #sample_freq = sp.fftpack.fftfreq(df.size, d=0.02)
+result_ifft = sp.fftpack.ifft(result)
 '''
 
 # Set highpass filter, cut-off as 30Hz, sampling frequency as 1000, order as 4
 result = butter_highpass_filter(s, 30, 1000, 4)
 #print(result)
-
-# result_ifft = sp.fftpack.ifft(result)
 
 init_data_sum = 0
 init_data_iter = 0
@@ -80,20 +80,49 @@ abs_result_adjusted = abs(result_adjusted)
 
 # Set lowpass filter, cut-off as 15Hz, sampling frequency as 1000, order as 4
 low_abs_result_adjusted = butter_lowpass_filter(abs_result_adjusted, 15, 1000, 4)
-
-# print(type(low_abs_result_adjusted)) → <class 'numpy.ndarray'>
+#print(type(low_abs_result_adjusted)) → <class 'numpy.ndarray'>
 
 # Normalization
 Zmax, Zmin = low_abs_result_adjusted.max(), low_abs_result_adjusted.min()
 norm_low_abs_result_adjusted = (low_abs_result_adjusted - Zmin) / (Zmax - Zmin)
 
-'''
-plt.figure()
-plt.plot(low_abs_result_adjusted, label='low_abs_adj')
-plt.plot(norm_low_abs_result_adjusted, label='norm_low_abs_adj')
-plt.legend(loc='upper left')
+plt.plot(norm_low_abs_result_adjusted)
 plt.show()
+#print(np.size(norm_low_abs_result_adjusted)) → 1984
+
+# Bank summation
+bank_all = []
+data_size = np.size(norm_low_abs_result_adjusted)
+sum_iter = np.around(data_size / 100)
+for_loop_count = 0 # Check the loop count until it becomes sum_iter
+bank_temp = 0 # Sum of all elements of a count
+bank_num = 0 # Naming the bank_temp
+
+'''
+TypeError: 'int' object is not callable → when var and func names are same
 '''
 
-# print(norm_low_abs_result_adjusted.size) → 1984
+for i in range(0, data_size):
+    bank_temp += norm_low_abs_result_adjusted[i]
+    for_loop_count += 1
+    if for_loop_count == sum_iter or i == data_size-1:
+        avg_temp = bank_temp / for_loop_count
+        #bank_all.append([bank_num, avg_temp])
+        bank_all.append(avg_temp)
+        bank_num += 1
+        for_loop_count = 0
+        bank_temp = 0
+#print(bank_all) → GOOD
+#print(np.size(bank_all))
 
+# Normalize the bank
+Zmax, Zmin = np.max(bank_all), np.min(bank_all)
+norm_bank_all = (bank_all - Zmin) / (Zmax - Zmin)
+
+temp_temp = []
+temp_temp.append(norm_bank_all)
+temp_temp.append(norm_bank_all)
+
+# Making heatmap
+plt.imshow(temp_temp, cmap='hot', interpolation='nearest')
+plt.show()
