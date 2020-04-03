@@ -62,6 +62,7 @@ rev_df_fft = np.abs(df_fft)
 result_ifft = sp.fftpack.ifft(result)
 '''
 
+nWindowSize = 20
 temp_temp = []
 
 for header_len in range (0, file_header_len):
@@ -102,7 +103,6 @@ for header_len in range (0, file_header_len):
     # Bank summation
     bank_all = []
     data_size = np.size(norm_low_abs_result_adjusted)
-    nWindowSize = 100
     sum_iter = np.around(data_size / nWindowSize)
     for_loop_count = 0 # Check the loop count until it becomes sum_iter
     bank_temp = 0 # Sum of all elements of a count
