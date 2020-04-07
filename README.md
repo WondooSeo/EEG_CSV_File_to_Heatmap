@@ -34,5 +34,7 @@ If your csv file has no header, you may have to revise this python file(or csv f
 # How I use it?
 
 ⓐ Write file name at var file_name.
+
 ⓑ You can manipulate the heatmap window size. Set var nWindowSize.
+
 ⓒ If you succeeded runnung this file, you can get heatmap csv data file, and heatmap plot png.
