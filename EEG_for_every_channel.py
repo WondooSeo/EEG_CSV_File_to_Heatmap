@@ -1,23 +1,54 @@
-'''
-# Ch1 - Ch8
-# In Pandas, don't have to worry about header
-Frontalis = []
-Procerus = []
-Orbiculari_oculi = []
-Zygomatic_major_minor = []
-Risorius = []
-Orbicularis_oris = []
-Masseter = []
-Depressor_labii_inferioris = []
-'''
+'''''''''
+
+Copyright ⓒ 2020 Won-Doo Seo(Neurorobotics Lab in Yonsei University), All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+------------------------------------------------
+
+What can I do it with it?
+
+You can make EEG csv file to heatmap file.
+Raw data go through Butterworth highpass filter, cut-off as 30Hz, sampling frequency as 1000, order as 4,
+then adjust the data, and absolte it. Absolted data go through Butterworth lowpass filter, cut-off as 15Hz,
+sampling frequency as 1000, order as 4, and normalize it. Finally, those data become a heatmap.
+
+------------------------------------------------
+
+How I preprocess the csv file?
+
+First, you have to make csv data as;
+    (In this example, a, b, etc is data.)
+    ch1 ch2 ch3 ch4 ...
+    a   b   c   d   ...
+    e   f   g   h   ...
+    .   .   .   .
+    .   .   .   .
+    .   .   .   .
+If your csv file has no header, you may have to revise this file.
+
+------------------------------------------------
+
+How I use it?
+
+ⓐ Write file name at var file_name.
+ⓑ You can manipulate the heatmap window size. Set var nWindowSize.
+ⓒ If you succeeded runnung this file, you can get heatmap csv data file, and heatmap plot png.
+
+'''''''''
 
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import butter, filtfilt
-#import scipy as sp
-#import scipy.fftpack
-#import seaborn as sns
 
 ''''''
 
@@ -47,30 +78,23 @@ def butter_lowpass(cutoff, fs, order):
 
 ''''''
 
-df = pd.read_csv('anger1.csv')
+file_name = ('anger4')
+
+df = pd.read_csv(file_name + '.csv')
 
 file_header = (list(df))
 #print(type(file_header)) → class 'list'
 file_header = list(filter(None, file_header)) # For erasing non column
 file_header_len = len(file_header)
 
-'''
-Not using this code;
-df_fft = sp.fftpack.fft(df)
-rev_df_fft = np.abs(df_fft)
-#sample_freq = sp.fftpack.fftfreq(df.size, d=0.02)
-result_ifft = sp.fftpack.ifft(result)
-'''
-
 nWindowSize = 20
-temp_temp = []
+data_temp = []
 
 for header_len in range (0, file_header_len):
     s = df[file_header[header_len]]
 
     # Set highpass filter, cut-off as 30Hz, sampling frequency as 1000, order as 4
     result = butter_highpass_filter(s, 30, 1000, 4)
-    #print(result)
 
     init_data_sum = 0
     init_data_iter = 0
@@ -80,13 +104,10 @@ for header_len in range (0, file_header_len):
         init_data_iter += 1
 
     init_data_mean = init_data_sum/init_data_iter
-    #print(init_data_mean)
 
     result_adjusted = result - init_data_mean
-    #print(result_adjusted)
 
     abs_result_adjusted = abs(result_adjusted)
-    #print(abs_result_adjusted)
 
     # Set lowpass filter, cut-off as 15Hz, sampling frequency as 1000, order as 4
     low_abs_result_adjusted = butter_lowpass_filter(abs_result_adjusted, 15, 1000, 4)
@@ -96,10 +117,6 @@ for header_len in range (0, file_header_len):
     Zmax, Zmin = low_abs_result_adjusted.max(), low_abs_result_adjusted.min()
     norm_low_abs_result_adjusted = (low_abs_result_adjusted - Zmin) / (Zmax - Zmin)
 
-    #plt.plot(norm_low_abs_result_adjusted)
-    #plt.show()
-    #print(np.size(norm_low_abs_result_adjusted)) → 1984
-
     # Bank summation
     bank_all = []
     data_size = np.size(norm_low_abs_result_adjusted)
@@ -107,10 +124,6 @@ for header_len in range (0, file_header_len):
     for_loop_count = 0 # Check the loop count until it becomes sum_iter
     bank_temp = 0 # Sum of all elements of a count
     bank_num = 0 # Naming the bank_temp
-
-    '''
-    TypeError: 'int' object is not callable → when var and func names are same
-    '''
 
     for i in range(0, data_size):
         bank_temp += norm_low_abs_result_adjusted[i]
@@ -122,19 +135,21 @@ for header_len in range (0, file_header_len):
             bank_num += 1
             for_loop_count = 0
             bank_temp = 0
-    #print(bank_all) → GOOD
-    #print(np.size(bank_all))
 
     # Normalize the bank
-    Zmax, Zmin = np.max(bank_all), np.min(bank_all)
-    norm_bank_all = (bank_all - Zmin) / (Zmax - Zmin)
+    Nmax, Nmin = np.max(bank_all), np.min(bank_all)
+    norm_bank_all = (bank_all - Nmin) / (Nmax - Nmin)
 
-    temp_temp.append(norm_bank_all)
+    data_temp.append(norm_bank_all)
+
 
 # Making heatmap
-plt.imshow(temp_temp, cmap='jet', interpolation='nearest')
+plt.imshow(data_temp, cmap='jet', interpolation='nearest')
 plt.colorbar(orientation='vertical')
-#plt.set_yticklabels(file_header, minor=False)
-plt.show()
+plt.savefig(file_name+'_heatmap.png', dpi=600)
 
-print(temp_temp)
+temp_T = np.transpose(data_temp)
+
+data_to_csv = pd.DataFrame(temp_T)
+file_path = file_name+'_heatmap.csv'
+data_to_csv.to_csv(file_path, header=None, index=None)
