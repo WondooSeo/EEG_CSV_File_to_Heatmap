@@ -14,7 +14,7 @@ all copies or substantial portions of the Software.
 
 ------------------------------------------------
 
-What can I do it with it?
+What can I do with it?
 
 You can make EEG csv file to heatmap file.
 Raw data go through Butterworth highpass filter, cut-off as 30Hz, sampling frequency as 1000, order as 4,
