@@ -1,4 +1,4 @@
-※ _Copyright ⓒ 2020 Won-Doo Seo(Neurorobotics Lab in Yonsei University), All rights reserved._
+※ _Copyright ⓒ 2020 Won-Doo Seo(Neurorobotics Lab in Yonsei University), All rights reserved._ ※
 
 # What can I do with it?
 
