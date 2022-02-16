@@ -1,4 +1,4 @@
-※ _Copyright ⓒ 2020 Won-Doo Seo(Neurorobotics Lab in Yonsei University), All rights reserved._ ※
+※ _This project is licensed under the terms of the MIT license._ ※
 
 # What can I do with it?
 
