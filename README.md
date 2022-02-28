@@ -7,6 +7,14 @@ Raw data go through Butterworth highpass filter, cut-off as 30Hz, sampling frequ
 then adjust the data, and absolte it. Absolted data go through Butterworth lowpass filter, cut-off as 15Hz,
 sampling frequency as 1000, order as 4, and normalize it. Finally, those data become a heatmap.
 
+<div align = 'center'>
+    
+![activate gif](https://user-images.githubusercontent.com/62936579/155922079-a73d7591-742a-4f66-9a7d-552eed70162f.gif)
+    
+[Fig 1] Example of the code
+    
+</div>
+
 # How I preprocess the csv file?
 
 First, you have to make csv data as;
