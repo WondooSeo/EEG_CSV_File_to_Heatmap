@@ -1,4 +1,4 @@
-※ _This project is licensed under the terms of the MIT license._ ※
+***※ This project is licensed under the terms of the MIT license. ※***
 
 # What can I do with it?
 
